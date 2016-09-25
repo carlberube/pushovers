@@ -10,14 +10,20 @@ public class LevelManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        GameObject masterControllerObject;
         GameObject gameManagerObject = GameObject.Find("GameManager");
         if (gameManagerObject)
         {
             gameManager = gameManagerObject.GetComponent<GameManager>();
-            GameObject masterControllerObject = gameManager.player;
-            masterController = masterControllerObject.GetComponent<PushoverController>();
-            masterController.startLevel(spawn.position);
+            masterControllerObject = gameManager.player;
         }
+        else
+        {
+            //Find the masterController like a big boy
+            masterControllerObject = GameObject.Find("Pushover1");
+        }
+        masterController = masterControllerObject.GetComponent<PushoverController>();
+        masterController.startLevel(spawn.position);
     }
 	
 	// Update is called once per frame

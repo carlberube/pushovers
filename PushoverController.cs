@@ -19,6 +19,8 @@ public class PushoverController : MonoBehaviour {
     private bool canMoveLeft = true;
     private bool canMoveRight = true;
 
+    private Animator anim;
+
     private Vector3 currentPos;
     private Vector3 lastPos;
 
@@ -33,26 +35,18 @@ public class PushoverController : MonoBehaviour {
         set
         {
             _activated = value;
-
-            if (value)
+            if (!anim)
             {
-                iTween.ColorFrom(gameObject, Color.green, 0.5f);
+                return;
             }
-            else
-            {
-                iTween.ColorFrom(gameObject, Color.red, 0.5f);
-            }
+            anim.SetBool("activated", _activated);
         }
     }
 
     // Use this for initialization
     void Start () {
+        anim = GetComponent<Animator>();
         slaves = new List<GameObject>();
-        Renderer pushoverRender = gameObject.GetComponent<Renderer>();
-        if (!activated) {
-            pushoverRender.material.color = Color.grey;
-        }
-        defaultColor = new Color(0.752f, 0.789f, 0.956f);
         factoryTransform = transform;
     }
 
@@ -66,10 +60,9 @@ public class PushoverController : MonoBehaviour {
     public void startLevel(Vector3 startPos)
     {
         // Move the player to the correct startPos
+        slaves = new List<GameObject>();
         this.transform.parent.transform.position = startPos;
         ResetTransform();
-        defaultColor = new Color(0.107f, 0.119f, 0.242f);
-        this.gameObject.GetComponent<Renderer>().material.SetColor("_Color", defaultColor);
         activated = true;
     }
 
@@ -165,27 +158,6 @@ public class PushoverController : MonoBehaviour {
                 }
             }
         }
-        if (master)
-        {
-            return;
-        }
-        List<GameObject> slavesToRemove = new List<GameObject>();
-        foreach(GameObject slaveObject in slaves)
-        {
-            float dist = Vector3.Distance(slaveObject.transform.position, transform.position);
-            if (dist > rayLength+0.01)
-            {
-                PushoverController controller = slaveObject.GetComponent<PushoverController>();
-                controller.activated = false;
-                controller.master = null;
-                slavesToRemove.Add(slaveObject);
-            }
-        }
-        foreach (GameObject slaveToRemove in slavesToRemove)
-        {
-            slaves.Remove(slaveToRemove);
-        }
-
     }
 
     void rollCharacter (string rotateAxis, float rotateAngle, Vector3 directionVector){
@@ -349,6 +321,10 @@ public class PushoverController : MonoBehaviour {
         {
             return;
         }
+        if (!activated)
+        {
+            return;
+        }
         foreach (RaycastHit hitInfo in raycastHits)
         {
             if (hitInfo.collider.gameObject.tag == "Player")
@@ -366,5 +342,21 @@ public class PushoverController : MonoBehaviour {
                 }
             }
         }
-	}
+        List<GameObject> slavesToRemove = new List<GameObject>();
+        foreach (GameObject slaveObject in slaves)
+        {
+            float dist = Vector3.Distance(slaveObject.transform.position, transform.position);
+            if (dist > rayLength + 0.01)
+            {
+                PushoverController controller = slaveObject.GetComponent<PushoverController>();
+                controller.activated = false;
+                controller.master = null;
+                slavesToRemove.Add(slaveObject);
+            }
+        }
+        foreach (GameObject slaveToRemove in slavesToRemove)
+        {
+            slaves.Remove(slaveToRemove);
+        }
+    }
 }

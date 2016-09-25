@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public bool levelReady = false;
 
     private GameObject levelImage;
+    private GameObject levelCompletedImage;
 
     private Text levelText;
 
@@ -19,12 +20,16 @@ public class GameManager : MonoBehaviour
     {
         levelImage = GameObject.Find("LevelImage");
         levelText = GameObject.Find("LevelText").GetComponent<Text>();
+
+        levelCompletedImage = GameObject.Find("LevelCompleted");
+
         InitGame();
     }
 
     //Initializes the game for each level.
     void InitGame()
     {
+        levelCompletedImage.SetActive(false);
         loadLevel(levelIndex);
     }
 
@@ -39,8 +44,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            int levelNumber = levelIndex + 1;
-            levelText.text = "Level " + levelNumber;
+            levelText.text = "Level " + levelIndex;
         }
 
         //Set levelImage to active blocking player's view of the game board during setup.
@@ -59,7 +63,15 @@ public class GameManager : MonoBehaviour
 
     public void levelCompleted()
     {
+        levelCompletedImage.SetActive(true);
+        Invoke("HideLevelCompletedImage", levelStartDelay);
         SceneManager.UnloadScene(levelIndex);
+
+    }
+
+    void HideLevelCompletedImage()
+    {
+        levelCompletedImage.SetActive(false);
         levelIndex += 1;
         loadLevel(levelIndex);
     }
