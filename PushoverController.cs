@@ -45,6 +45,7 @@ public class PushoverController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        previousParent = transform.parent;
         anim = GetComponent<Animator>();
         slaves = new List<GameObject>();
         factoryTransform = transform;
